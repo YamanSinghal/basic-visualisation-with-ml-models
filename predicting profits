@@ -1,0 +1,49 @@
+import matplotlib.pyplot as plt 
+plt.style.use('ggplot')
+%matplotlib inline
+import numpy as np
+import pandas as pd  
+import seaborn as sns 
+plt.rcParams['figure.figsize'] = (12, 8)
+data= pd.read_csv("bike_sharing_data.txt")
+x = data.Population.values
+y = data.Profit.values
+x = np.reshape(x,(len(x),1))
+y = np.reshape(y,(len(y),1))
+x.shape
+plt.scatter(x,y,marker = "^",s = 100)
+plt.title("Profit")
+theta = np.zeros((2,1))
+m = len(x)
+X = np.append(np.ones((m,1)),x,axis = 1)
+def cost_function(X,y,theta):
+    m = len(y)
+    y_pred = np.dot(X,theta)
+    cost = (1/(2*m)) * np.sum((y_pred-y)**2)
+    return cost
+def gradient_descent(X,y,alpha,theta,iterations):
+    m = len(y)
+    costs = []
+    for i in range(iterations):
+        y_pred = np.dot(X,theta)
+        dw = np.dot(X.T,(y_pred-y))
+        theta = theta - alpha * 1/m*dw
+        cost = cost_function(X,y,theta)
+        costs.append(cost)
+        
+    return theta,costs
+
+theta,costs = gradient_descent(X,y,0.01,theta,5000)
+print(theta,costs[-1])
+plt.plot(costs)
+theta = np.squeeze(theta)
+plt.scatter(x,y,marker = "^",color = "blue",s = 60)
+x_b = np.array((np.min(X[:,1]),np.max(X[:,1])))
+y_b = x_b * theta[1] + theta[0]
+plt.plot(x_b,y_b)
+def predict(x,theta):
+    y_pred = np.dot(x.T,theta)
+    return y_pred
+    
+y_pred1 = predict(np.array([1,4]),theta)
+print(y_pred1) 
